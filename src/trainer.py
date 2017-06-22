@@ -6,6 +6,7 @@ import tensorflow as tf
 
 from mlp_model import MLPConfig, MLP
 
+
 def define_flags():
     tf.app.flags.DEFINE_integer("epochs", 10, "Number of epochs.")
     tf.app.flags.DEFINE_integer("batch_size", 1024, "Batch size.")
@@ -16,8 +17,11 @@ def define_flags():
     tf.app.flags.DEFINE_float("decay", 0, "Learning rate decay.")
     tf.app.flags.DEFINE_float("dropout", 0.5, "Dropout rate.")
     tf.app.flags.DEFINE_float("max_grad_norm", 5., "Max grad norm.")
-    tf.app.flags.DEFINE_integer("auc_nthresholds", 1000, "Number of AUC thresholds.")
-    tf.app.flags.DEFINE_integer("nruns", 10, "Number of searching hyperparameters")
+    tf.app.flags.DEFINE_integer(
+        "auc_nthresholds", 1000, "Number of AUC thresholds.")
+    tf.app.flags.DEFINE_integer(
+        "nruns", 10, "Number of searching hyperparameters")
+
 
 def get_loss_weights(y, weight_dict=None):
     if weight_dict is None:
@@ -37,7 +41,7 @@ def evaluate(sess, model, x, y):
 
 def select_hyperparameters():
     # SEARCH INTERVALS
-    lr_int = [-3, 0]
+    lr_int = [-4, 1.5]
     reg_int = [-3, 0]
 
     sess = tf.Session()

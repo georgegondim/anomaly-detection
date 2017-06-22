@@ -1,46 +1,17 @@
-import numpy as np
-import time
 import math
-import sys
-import matplotlib.pyplot as plt
 import pickle
+import sys
+import time
 
-from sklearn.metrics import roc_auc_score, log_loss, roc_curve
-
-from keras.models import Model
-from keras.layers import Input, Dense, Activation, Dropout
+from keras.layers import Activation, Dense, Dropout, Input
 from keras.layers.normalization import BatchNormalization
+from keras.models import Model
 from keras.optimizers import Adam
 from keras.regularizers import l2
 
+import numpy as np
 
-def plot_roc(model, x, y):
-    if params['weights'] is not None:
-        weights = np.empty_like(y)
-        weights[y == 0] = params['weights'][0]
-        weights[y == 1] = params['weights'][1]
-    else:
-        weights = None
-
-    y_score = model.predict(x)
-    fpr, tpr, _ = roc_curve(y, y_score, sample_weight=weights)
-    roc_auc = roc_auc_score(y, y_score, sample_weight=weights)
-    plt.plot(fpr, tpr, label='ROC curve (area = %0.5f)' % roc_auc)
-    plt.plot(np.arange(0, 1.1, 0.1), np.arange(0, 1.1, 0.1))
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.legend(loc="lower right")
-
-
-def plot_evolution(scores_train, scores_val, metric, loc=None):
-    plt.plot(scores_train[metric], label='training')
-    plt.plot(scores_val[metric], label='validation')
-    plt.xlabel('epoch')
-    plt.ylabel(metric)
-    if loc is None:
-        plt.legend(loc="upper right")
-    else:
-        plt.legend(loc=loc)
+from sklearn.metrics import log_loss, roc_auc_score
 
 
 def print_log(log_fp, s, newline=True, verbose=True):
@@ -74,9 +45,9 @@ def clean_params(params):
 
 def get_model_name(auc, lr, reg):
     name = 'model.' \
-            + 'auc:%.6f.' % auc \
-            + 'lr:%.6f.' % lr \
-            + 'reg:%.6f.' % reg
+        + 'auc:%.6f.' % auc \
+        + 'lr:%.6f.' % lr \
+           + 'reg:%.6f.' % reg
     return name
 
 
@@ -115,13 +86,13 @@ def select_hyperparameters(params, log_filename):
     save_history = params['save_history']
 
     # SEARCH INTERVALS
-    lr_int = [-2.77 , -2.28]
+    lr_int = [-2.77, -2.28]
     reg_int = [-3.0, -2.50]
-    #lrdecay_int = [-0., 0.]
-    #dropout_int = [0.5, 0.5]
-    #width_int = [100]
-    #nlayers_int = [1, 2]
 
+    # lrdecay_int = [-0., 0.]
+    # dropout_int = [0.5, 0.5]
+    # width_int = [100]
+    # nlayers_int = [1, 2]
 
     for n in range(nruns):
         start_time = time.time()
@@ -131,11 +102,11 @@ def select_hyperparameters(params, log_filename):
         logreg = np.random.uniform(reg_int[0], reg_int[1])
         reg = math.pow(10, logreg)
 
-        #logdecay = np.random.uniform(lrdecay_int[0], lrdecay_int[1])
-        #decay = math.pow(10, loglrdecay)
-        #dropout = np.random.uniform(dropout_int[0], dropout_int[1])
-        #hidden_width = width_int[np.random.randint(0, len(width_int))]
-        #nlayers = np.random.randint(nlayers_int[0], nlayers_int[1] + 1)
+        # logdecay = np.random.uniform(lrdecay_int[0], lrdecay_int[1])
+        # decay = math.pow(10, loglrdecay)
+        # dropout = np.random.uniform(dropout_int[0], dropout_int[1])
+        # hidden_width = width_int[np.random.randint(0, len(width_int))]
+        # nlayers = np.random.randint(nlayers_int[0], nlayers_int[1] + 1)
 
         params['reg'] = reg
         params['lr'] = lr
@@ -170,13 +141,16 @@ def select_hyperparameters(params, log_filename):
             y_score = model.predict(x_val)
             val_auc = roc_auc_score(y_val, y_score, sample_weight=val_weights)
             if save_history:
-                val_loss = log_loss(y_val, y_score, 10e-8, sample_weight=val_weights)
+                val_loss = log_loss(y_val, y_score, 10e-8,
+                                    sample_weight=val_weights)
                 scores_val['auc'].append(val_auc)
                 scores_val['loss'].append(val_loss)
 
                 y_score = model.predict(x_train)
-                train_auc = roc_auc_score(y_train, y_score, sample_weight=train_weights)
-                train_loss = log_loss(y_train, y_score, 10e-8, sample_weight=train_weights)
+                train_auc = roc_auc_score(
+                    y_train, y_score, sample_weight=train_weights)
+                train_loss = log_loss(
+                    y_train, y_score, 10e-8, sample_weight=train_weights)
                 scores_train['auc'].append(train_auc)
                 scores_train['loss'].append(train_loss)
 
@@ -186,7 +160,8 @@ def select_hyperparameters(params, log_filename):
                 if save_history:
                     loss = val_loss
                 else:
-                    loss = log_loss(y_val, y_score, 10e-8, sample_weight=val_weights)
+                    loss = log_loss(y_val, y_score, 10e-8,
+                                    sample_weight=val_weights)
 
         model_name = get_model_name(auc, lr, reg)
         best_model.save_weights('../model/' + model_name + 'hdf5')
@@ -257,13 +232,13 @@ if __name__ == '__main__':
         'decay': 0.0,
         'reg': 0.,
         'loss': 'binary_crossentropy',
-        'hidden_width': [100]*nlayers,
+        'hidden_width': [100] * nlayers,
         'hidden_activation': 'relu',
         'regularizer': l2(0.0015515536),
         'weight_dict': [],
         'train_weights': [],
         'val_weights': [],
-        'dropout': [0.5]*nlayers,
+        'dropout': [0.5] * nlayers,
         'optimizer': Adam(lr=0.0033049896, decay=0.),
         'initializer': 'he_normal',
         'batchnorm': True,
@@ -274,21 +249,22 @@ if __name__ == '__main__':
     }
 
     params['weight_dict'] = {
-        0:len(y_train) / np.sum(1 - y_train),
-        1:len(y_train) / np.sum(y_train)
+        0: len(y_train) / np.sum(1 - y_train),
+        1: len(y_train) / np.sum(y_train)
     }
     params['train_weights'] = get_data_weights(params['weight_dict'], y_train)
     params['val_weights'] = get_data_weights(params['weight_dict'], y_val)
 
     log_filename = '../results.log'
-    #select_hyperparameters(params, log_filename)
+    # select_hyperparameters(params, log_filename)
     reg = 0.1
     lr = 0.003
     decay = 0.01
     params['optimizer'] = Adam(lr=lr, decay=decay)
     params['regularizer'] = l2(reg)
     model = classic_mlp(params)
-    model.load_weights('../model/model.auc:0.987883.lr:0.003305.reg:0.001552.hdf5')
+    model.load_weights(
+        '../model/model.auc:0.987883.lr:0.003305.reg:0.001552.hdf5')
 
     best_model = None
     auc = -1
@@ -320,8 +296,10 @@ if __name__ == '__main__':
         scores_val['loss'].append(val_loss)
 
         y_score = model.predict(x_train, batch_size=batch_size)
-        train_auc = roc_auc_score(y_train, y_score, sample_weight=train_weights)
-        train_loss = log_loss(y_train, y_score, 10e-8, sample_weight=train_weights)
+        train_auc = roc_auc_score(
+            y_train, y_score, sample_weight=train_weights)
+        train_loss = log_loss(y_train, y_score, 10e-8,
+                              sample_weight=train_weights)
         scores_train['auc'].append(train_auc)
         scores_train['loss'].append(train_loss)
         print('\tauc: %f loss: %e' % (train_auc, train_loss))
