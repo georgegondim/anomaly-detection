@@ -1,10 +1,14 @@
+imgs/*
+imgs/
 report/*
+outputs/
+outputs/*
 data/
 data/*
-history/
-history/*
-model/
-model/*
+*_history/
+*_history/*
+*_model/
+*_model/*
 clean.sh
 svm_model/*
 
