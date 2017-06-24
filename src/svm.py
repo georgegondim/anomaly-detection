@@ -21,7 +21,7 @@ def train_model(dict_log):
         kernel="rbf",
         probability=True,
         shrinking=False,
-        verbose=True,
+        verbose=False,
         cache_size=6000,
         class_weight=weight_dict)
 
@@ -56,7 +56,7 @@ x_val, y_val = x_val[idx], y_val[idx]
 
 # Parameters to cross-validate
 list_C = np.float_power(2, np.arange(-10, 11))[::-1]
-list_gamma = np.float_power(2, np.arange(-10, 2))
+list_gamma = np.float_power(2, np.arange(-10, -1))
 
 num_workers = 4
 dicts = []
@@ -70,10 +70,7 @@ print('Total number of experiments: %d' % len(dicts))
 print(str(list_C))
 print(str(list_gamma))
 
+#fp = open("results.log", "a")
 
-fp = open("results.log", "a")
-
-#train_model(dicts[0])
-
-result = Parallel(n_jobs=num_workers)(
-    delayed(train_model)(dict) for dict in dicts)
+#result = Parallel(n_jobs=num_workers)(
+#    delayed(train_model)(dict) for dict in dicts)
